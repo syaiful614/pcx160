@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PCX 160 Service Dashboard</title>
+<meta name="theme-color" content="#08080a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PCX 160">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+@font-face{font-family:"Titillium Web";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/titillium-web-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Titillium Web";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/titillium-web-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Titillium Web";font-weight:700;font-style:normal;font-display:swap;src:url(fonts/titillium-web-latin-700-normal.woff2) format("woff2")}
+:root{--f:"Titillium Web",system-ui,sans-serif;--bg:#08080a;--panel:#121215;--line:#26262c;--text:#f1efe9;--mute:#8d8f98;--track:#202026;--acc:#ffd400;--on:#0a0a0b;--ok:#3ddc97;--soon:#ffb020;--due:#ff4d3d;--mute2:#8d8f98;padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;color:var(--text);font:400 16px/1.55 var(--f);background:radial-gradient(900px 500px at 90% -5%,color-mix(in srgb,var(--acc) 14%,transparent),transparent),repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 2px,transparent 2px 6px),var(--bg)}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,.card:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 22px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:rgba(8,8,10,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{font:700 22px var(--f);letter-spacing:.06em}.logo span{color:var(--acc)}
+.links{display:flex;gap:6px}
+.links a{color:var(--mute);text-decoration:none;font:600 12px var(--f);letter-spacing:.14em;text-transform:uppercase;padding:8px 12px;border-bottom:2px solid transparent;transition:color .2s,border-color .2s}
+.links a:hover,.links a.on{color:var(--text);border-color:var(--acc)}
+.ghost,.btn,.chip{position:relative;overflow:hidden;cursor:pointer}
+.ghost{background:none;border:1px solid var(--line);padding:8px 14px;font:600 12px var(--f);letter-spacing:.08em;color:var(--mute);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.ghost:hover{color:var(--text);border-color:var(--acc)}
+.btn{background:var(--acc);color:var(--on);border:0;padding:12px 20px;font:700 13px var(--f);letter-spacing:.12em;text-transform:uppercase;clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);transition:filter .2s}
+.btn:hover{filter:brightness(1.12)}
+.pop::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.4);pointer-events:none;animation:pop .6s ease-out}
+@keyframes pop{from{clip-path:circle(0 at var(--cx) var(--cy));opacity:1}to{clip-path:circle(160% at var(--cx) var(--cy));opacity:0}}
+main{max-width:1040px;margin:0 auto;padding:0 22px 80px}
+.hero{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:60px 0 30px;isolation:isolate}
+.ghosttxt{position:absolute;left:-2%;top:2%;font:700 clamp(120px,26vw,330px)/1 var(--f);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.07);z-index:-1;white-space:nowrap;pointer-events:none}
+h1{font:700 clamp(54px,9vw,120px)/.92 var(--f);text-transform:uppercase;margin:0 0 18px}
+h1 em{font-style:normal;color:transparent;-webkit-text-stroke:2px var(--acc)}
+.hero p{color:var(--mute);max-width:42ch;margin:0}
+.odo{margin-top:26px;padding:20px;background:rgba(255,255,255,.035);border-left:3px solid var(--acc);clip-path:polygon(0 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%)}
+.odo label{font:600 12px var(--f);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.digits{display:flex;align-items:baseline;gap:4px;margin:10px 0 16px;font:500 clamp(34px,7vw,54px) var(--f);font-variant-numeric:tabular-nums}
+.digits i{font-style:normal;padding:0 .2em;min-width:.9em;text-align:center;background:linear-gradient(#1d1d22,#09090b);border:1px solid var(--line);border-bottom:2px solid var(--acc)}
+.digits u{text-decoration:none;color:var(--mute)}
+.digits small{font:600 14px var(--f);color:var(--mute);margin-left:8px}
+.row{display:flex;gap:10px}
+input[type=number],input[type=date],input[type=text],select{color-scheme:dark;flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);padding:11px 14px;font-weight:500;font-size:16px}
+.gauge{position:relative;max-width:420px;width:100%;margin:0 auto}
+.gauge svg{width:100%;display:block;overflow:visible}
+.gt,.gp{fill:none;stroke-width:10}
+.gt{stroke:var(--track);stroke-dasharray:377 126}
+.gp{stroke:var(--acc);stroke-dasharray:0 503;transition:stroke-dasharray 1.4s cubic-bezier(.2,.8,.2,1)}
+.tick{stroke:var(--mute);stroke-width:1.2;opacity:.6}
+.needle{transform-origin:100px 100px;transform:rotate(-135deg);transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}
+.needle line{stroke:var(--text);stroke-width:2.4}
+.needle circle{fill:var(--acc)}
+.gc{position:absolute;left:0;right:0;bottom:6%;text-align:center}
+.gc b{display:block;font:600 clamp(34px,6vw,52px)/1 var(--f)}
+.gc span{display:block;color:var(--mute);font-size:13px;margin-top:4px}
+.sh{display:flex;align-items:center;gap:16px;margin:56px 0 20px}
+.sh::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--acc),transparent)}
+h2{margin:0;font:600 clamp(26px,4vw,40px) var(--f);text-transform:uppercase;letter-spacing:.04em}
+.g2,.g3{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.ok{--c:var(--ok)}.soon{--c:var(--soon)}.due{--c:var(--due)}.mute{--c:var(--mute2)}
+.card{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:20px;background:linear-gradient(160deg,var(--panel),#0b0b0d);border-left:3px solid var(--c,var(--line));cursor:pointer;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s}
+.card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--acc) 20%,transparent),transparent 70%)}
+.card:hover::after{opacity:1}
+.card>*{position:relative;z-index:1}
+.card>.num{position:absolute;z-index:0}
+.kpb{cursor:default;min-height:230px}
+.num{right:20px;bottom:-30px;font:700 150px/1 var(--f);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.1);pointer-events:none}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.top h3{margin:0;font:600 19px var(--f);letter-spacing:.04em;text-transform:uppercase}
+.comp .top h3::after{content:"+";display:inline-block;margin-left:10px;color:var(--acc);transition:transform .3s}
+.comp.open .top h3::after{transform:rotate(45deg)}
+.pill{font:700 11px var(--f);letter-spacing:.08em;text-transform:uppercase;color:var(--c);border:1px solid currentColor;padding:4px 10px;white-space:nowrap}
+.sub{color:var(--mute);font-size:13px;margin:0}
+.free{margin:0;font-weight:600}
+.bar{height:4px;background:var(--track)}
+.bar i{display:block;height:100%;background:var(--c)}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--mute)}
+.meta b{color:var(--text);font-weight:600}
+.more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s}
+.open .more{grid-template-rows:1fr}
+.more>div{overflow:hidden;display:flex;flex-direction:column;gap:8px}
+.hold{position:relative;overflow:hidden;width:100%;height:44px;margin-top:auto;background:transparent;border:1px solid var(--line);font:600 12px var(--f);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.hold span{position:relative;z-index:1}
+.hold::before,.hold::after{content:"";position:absolute;left:0;width:0;transition:width .25s}
+.hold::before{inset-block:0;background:color-mix(in srgb,var(--acc) 35%,transparent)}
+.hold::after{bottom:0;height:3px;background:var(--acc)}
+.hold.holding::before,.hold.holding::after{width:100%;transition:width .8s linear}
+.hold:hover{border-color:var(--acc)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chip{background:none;border:1px solid var(--line);padding:8px 14px;font:600 12px var(--f);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);transition:color .2s,border-color .2s}
+.chip b{margin-left:6px;color:var(--text)}
+.chip:hover,.chip.on{color:var(--text);border-color:var(--acc)}
+.chip.on{background:color-mix(in srgb,var(--acc) 18%,transparent)}
+.empty{grid-column:1/-1;color:var(--mute);padding:14px 0;margin:0}
+.log{list-style:none;margin:0;padding:0 0 0 18px;border-left:1px solid var(--line)}
+.log li{position:relative;display:flex;justify-content:space-between;gap:10px;padding:12px 0 12px 14px;border-bottom:1px solid var(--line);font-size:14px}
+.log li:not(.empty)::before{content:"";position:absolute;left:-23px;top:19px;width:9px;height:9px;background:var(--acc);transform:rotate(45deg)}
+.log span{color:var(--mute)}
+.note{margin-top:40px;font-size:12.5px;color:var(--mute);max-width:70ch}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:16px;max-width:calc(100% - 32px);padding:12px 16px;background:var(--panel);border-left:3px solid var(--acc);box-shadow:0 12px 40px rgba(0,0,0,.6);transform:translate(-50%,200%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.toast.show{transform:translate(-50%,0)}
+.toast button{background:none;border:0;color:var(--acc);font:700 12px var(--f);letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.wipe{position:fixed;inset:0;z-index:50;background:var(--acc);pointer-events:none;clip-path:polygon(-70% 0,-45% 0,-85% 100%,-110% 100%)}
+.wipe.go{animation:wipe .8s cubic-bezier(.7,0,.2,1)}
+@keyframes wipe{from{clip-path:polygon(-70% 0,-45% 0,-85% 100%,-110% 100%)}to{clip-path:polygon(140% 0,165% 0,125% 100%,100% 100%)}}
+.enter{animation:cardIn .55s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i)*60ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(26px) skewY(2deg)}}
+.enter .bar i{animation:grow 1s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes grow{from{width:0}}
+.odo label.l2{display:block;margin:16px 0 6px}
+#buyIn{width:100%}
+.add{flex-wrap:wrap;margin-bottom:12px}
+.add>*{flex:1 1 150px}
+.add .btn{flex:0 0 auto}
+.tools{margin-bottom:18px;flex-wrap:wrap}
+.del{background:none;border:0;margin-left:14px;color:var(--mute);font:600 12px var(--f);text-decoration:underline;cursor:pointer}
+.del:hover{color:var(--due)}
+.next{display:grid;gap:10px;margin-bottom:12px}
+.nx{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(160deg,var(--panel),#0b0b0d);border-left:3px solid var(--c)}
+.nx span{color:var(--mute);font-size:13px}
+.nx .when{text-align:right;font-weight:600;color:var(--c)}
+.hint{color:var(--mute);font-size:13px;margin:0}
+.sub2{margin:28px 0 10px;font:600 15px var(--f);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+details.visit{margin-bottom:14px;padding:0 16px;border:1px solid var(--line);background:rgba(255,255,255,.02)}
+details.visit summary{display:flex;justify-content:space-between;padding:14px 0;cursor:pointer;list-style:none;font:600 14px var(--f);letter-spacing:.1em;text-transform:uppercase}
+details.visit summary::-webkit-details-marker{display:none}
+details.visit summary::after{content:"+";color:var(--acc);transition:transform .3s}
+details.visit[open] summary::after{transform:rotate(45deg)}
+details.visit summary:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.vbody{padding-bottom:16px}
+.wide{width:100%;margin-bottom:12px}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px;margin:12px 0}
+.checks label{display:flex;gap:10px;align-items:center;padding:9px 12px;border:1px solid var(--line);cursor:pointer;font-size:14px;transition:border-color .2s,background .2s}
+.checks label:has(input:checked){border-color:var(--acc);background:color-mix(in srgb,var(--acc) 14%,transparent)}
+.checks input{accent-color:var(--acc);width:16px;height:16px;flex:none}
+#cek.ready h2{color:var(--ok)}
+.docs label{display:flex;flex-direction:column;gap:6px;color:var(--mute);font-size:13px}
+.bars{display:flex;gap:10px;align-items:flex-end;margin-bottom:8px}
+.bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;min-height:130px}
+.bars i{display:block;width:100%;background:var(--acc)}
+.bars b{font-size:12px}.bars span{font-size:12px;color:var(--mute)}
+.hint.due{color:var(--due)}
+.sum{font-weight:600;margin:14px 0 0}
+.sm{font-size:12px}
+.stamp{align-self:flex-start;margin-top:auto}
+.mh{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.mh span{color:var(--mute)}
+.mg{padding:14px 18px;margin-bottom:8px;background:linear-gradient(160deg,var(--panel),#0b0b0d);border-left:3px solid var(--acc)}
+.mg h4{margin:0 0 4px;font:600 14px var(--f);letter-spacing:.08em;text-transform:uppercase}
+.mg h4 b{color:var(--acc);margin-left:6px}
+.mg p{margin:0}
+.spec{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.sp{padding:12px 16px;background:linear-gradient(160deg,var(--panel),#0b0b0d);border-left:3px solid var(--acc)}
+.sp span{display:block;color:var(--mute);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.sp b{font-weight:600}
+.nx .when span{font-weight:400}
+.ponly{display:none}
+@media print{
+  body{background:#fff;color:#000}
+  .nav,.hero,#berikut,#cek,#komponen,#tonggak,.add,.tools,.del,details.visit,.toast,.wipe,.hold,.stamp,.note,.hint,#riwayat .sh{display:none!important}
+  .card{clip-path:none;background:#fff;color:#000;border:1px solid #999;transform:none;min-height:0}
+  .card::after,.num{display:none}
+  .log li{border-color:#999}.log span,.sub,.meta{color:#333}
+  main{max-width:none;padding:0}
+  .ponly{display:block}
+}
+@media(max-width:820px){.links{display:none}.hero{grid-template-columns:1fr;gap:28px;padding-top:36px}.g2,.g3{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="logo">PCX<span>160</span></span>
+  <div class="links"><a href="#dasbor">Dasbor</a><a href="#berikut">Berikutnya</a><a href="#kpb">KPB</a><a href="#komponen">Komponen</a><a href="#riwayat">Riwayat</a></div>
+  <button class="ghost" id="inst" type="button" hidden>Pasang aplikasi</button>
+  <button class="ghost" id="acc" type="button">Warna: Giallo</button>
+</nav>
+<main>
+  <section class="hero" id="dasbor">
+    <div class="ghosttxt" aria-hidden="true">PCX160</div>
+    <div>
+      <h1>Rawat<br><em>presisi.</em></h1>
+      <p>Catat odometer, lihat komponen yang mendekati jadwal servis, dan simpan riwayat perawatan Honda PCX 160 Anda di perangkat ini.</p>
+      <div class="odo">
+        <label for="odoIn">Odometer saat ini</label>
+        <div class="digits" id="odoShow"></div>
+        <div class="row">
+          <input id="odoIn" type="number" inputmode="numeric" min="0" placeholder="Contoh: 5200">
+          <button class="btn" id="saveOdo" type="button">Simpan</button>
+        </div>
+        <label class="l2" for="buyIn">Tanggal beli motor, untuk batas bulan KPB</label>
+        <input id="buyIn" type="date">
+      </div>
+    </div>
+    <div class="gauge">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="gt" cx="100" cy="100" r="80" transform="rotate(135 100 100)"/>
+        <circle class="gp" id="gArc" cx="100" cy="100" r="80" transform="rotate(135 100 100)"/>
+        <g id="ticks"></g>
+        <g class="needle" id="needle"><line x1="100" y1="100" x2="100" y2="38"/><circle cx="100" cy="100" r="6"/></g>
+      </svg>
+      <div class="gc"><b id="gVal">--</b><span>Kondisi komponen</span><span id="gSub"></span></div>
+    </div>
+  </section>
+
+  <section id="berikut">
+    <div class="sh"><h2>Servis berikutnya</h2></div>
+    <div class="next" id="nextBox"></div>
+    <div class="row tools"><button class="ghost" id="ics" type="button">Simpan pengingat ke kalender</button></div>
+    <h3 class="sub2">Dokumen</h3>
+    <div class="row add docs">
+      <label>Pajak STNK berlaku sampai<input id="dStnk" type="date"></label>
+      <label>SIM berlaku sampai<input id="dSim" type="date"></label>
+    </div>
+    <p class="hint" id="dInfo"></p>
+    <h3 class="sub2">Km per bulan</h3>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section id="cek">
+    <div class="sh"><h2>Cek sebelum berkendara</h2></div>
+    <div class="checks" id="preList"></div>
+    <p class="hint" id="preMsg"></p>
+  </section>
+
+  <section id="kpb">
+    <div class="sh"><h2>Kupon servis gratis</h2></div>
+    <div class="g3" id="kpbList"></div>
+  </section>
+
+  <section id="komponen">
+    <div class="sh"><h2>Jadwal komponen</h2></div>
+    <div class="chips" id="chips"></div>
+    <div class="g2" id="grid"></div>
+  </section>
+
+  <section id="tonggak">
+    <div class="sh"><h2>Per tonggak servis</h2></div>
+    <div class="chips" id="msChips"></div>
+    <div id="msBox"></div>
+  </section>
+
+  <section id="garansi">
+    <div class="sh"><h2>Garansi</h2></div>
+    <div class="next" id="warBox"></div>
+    <p class="hint">Garansi hanya berlaku bila motor dirawat teratur di AHASS sesuai jadwal, dibuktikan dengan KPB dan lembar monitoring yang distempel. Buku pedoman yang hilang atau rusak membatalkan garansi. Suku cadang habis pakai tidak ditanggung, antara lain busi, baterai, saringan, kampas rem dan kopling, bola lampu, sekring, ban, belt drive, dan roller weight. Keluhan layanan AHASS: Honda Customer Care 1-500-989, 0811-9-500-989, customercare@astra-honda.com.</p>
+  </section>
+
+  <section id="spek">
+    <div class="sh"><h2>Spesifikasi cepat</h2></div>
+    <div class="spec"><div class="sp"><span>Bahan bakar</span><b>Bensin tanpa timbal, RON 91 atau lebih tinggi (tipe IN 90, tipe MM 95). Tangki 8,1 L</b></div><div class="sp"><span>Oli mesin</span><b>SAE 10W-30, JASO MB, API SJ atau lebih tinggi. 0,8 L, 0,85 L dengan kasa, 0,9 L setelah pembongkaran</b></div><div class="sp"><span>Oli final drive</span><b>0,12 L, 0,14 L setelah pembongkaran</b></div><div class="sp"><span>Busi</span><b>NGK LMAR8L-9, celah 0,8 sampai 0,9 mm</b></div><div class="sp"><span>Putaran stasioner</span><b>1.700 ± 100 rpm</b></div><div class="sp"><span>Minyak rem</span><b>Honda DOT 3 atau DOT 4</b></div><div class="sp"><span>Cairan pendingin</span><b>Honda Pre-Mix Coolant tanpa campuran air, 0,50 L</b></div><div class="sp"><span>Ban depan</span><b>110/70-14M/C 50P tubeless. 200 kPa (29 psi). Tapak minimum 1,5 mm</b></div><div class="sp"><span>Ban belakang</span><b>130/70-13M/C 63P tubeless. 225 kPa (33 psi), berboncengan 250 kPa (36 psi). Tapak minimum 2,0 mm</b></div><div class="sp"><span>Gas tangan</span><b>Jarak main bebas 2 sampai 6 mm</b></div><div class="sp"><span>Sekring</span><b>Utama 30 A. Lainnya: tipe CBS 10 A dan 7,5 A, tipe ABS 15 A, 10 A, dan 7,5 A</b></div><div class="sp"><span>Lampu</span><b>Semua LED: depan, rem, sein, plat nomor, senja</b></div><div class="sp"><span>Baterai Honda SMART Key</span><b>CR2032 atau CR2032H. Ganti bila indikator berkedip 5 kali saat kunci diputar ke On</b></div></div>
+  </section>
+
+  <section id="riwayat">
+    <div class="ponly"><h2>Riwayat servis Honda PCX 160</h2><p id="pInfo"></p></div>
+    <div class="sh"><h2>Riwayat servis</h2></div>
+    <details class="visit" id="visit">
+      <summary>Catat kunjungan bengkel</summary>
+      <div class="vbody">
+        <div class="row add">
+          <input id="hKm" type="number" inputmode="numeric" min="0" placeholder="Km saat servis" aria-label="Km saat servis">
+          <input id="hDate" type="date" aria-label="Tanggal servis">
+          <select id="hKpb" aria-label="Kupon KPB"><option value="">Tanpa KPB</option><option value="kpb1">KPB 1</option><option value="kpb2">KPB 2</option><option value="kpb3">KPB 3</option></select>
+        </div>
+        <div class="checks" id="hChecks"></div>
+        <div class="row add">
+          <input id="hShop" type="text" maxlength="60" placeholder="Nama bengkel" aria-label="Nama bengkel">
+          <input id="hCost" type="number" inputmode="numeric" min="0" placeholder="Total biaya (Rp)" aria-label="Total biaya">
+        </div>
+        <input id="hNote" class="wide" type="text" maxlength="160" placeholder="Catatan" aria-label="Catatan">
+        <button class="btn" id="hAdd" type="button">Simpan kunjungan</button>
+      </div>
+    </details>
+    <div class="row tools">
+      <button class="ghost" id="exp" type="button">Ekspor cadangan</button>
+      <button class="ghost" id="imp" type="button">Impor cadangan</button>
+      <button class="ghost" id="prt" type="button">Cetak atau simpan PDF</button>
+      <input id="impFile" type="file" accept="application/json,.json" hidden>
+    </div>
+    <p class="hint" id="bk"></p>
+    <ul class="log" id="log"></ul>
+    <p class="sum" id="costSum"></p>
+  </section>
+
+  <p class="note">Sumber: Buku Pedoman Pemilik PCX160 CBS-ABS, tabel KPB dan Jadwal Perawatan Berkala (hal. 80 - 81). KPB 1 sampai 3 berlaku sampai batas km atau bulan yang tercapai lebih dulu, dihitung sejak tanggal pembelian. Servis ke-4 dan seterusnya berbayar di 18.000, 24.000, 30.000 km dan seterusnya. Oli mesin diganti pertama kali di 1.000 km, lalu tiap 6.000 km atau setahun. Pada odometer yang lebih tinggi, ulangi sesuai interval. Isi lembar Monitoring Jadwal Perawatan Berkala di buku dan bawa buku ke AHASS tiap servis agar garansi tetap berlaku.</p>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="tMsg"></span><button id="tUndo" type="button">Urungkan</button></div>
+<div class="wipe" id="wipe" aria-hidden="true"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const KPB=[
+ {id:"kpb1",name:"KPB 1",km:1000,mo:2,when:"Maks. 1.000 km atau bulan ke-2",free:"Gratis jasa servis dan oli mesin"},
+ {id:"kpb2",name:"KPB 2",km:6000,mo:6,when:"Maks. 6.000 km atau bulan ke-6",free:"Gratis jasa servis"},
+ {id:"kpb3",name:"KPB 3",km:12000,mo:12,when:"Maks. 12.000 km atau bulan ke-12",free:"Gratis jasa servis"}
+];
+const ITEMS=[
+ {id:"oli",name:"Oli mesin",km:6000,mo:12,note:"Ganti. SAE 10W-30, JASO MB, API SJ atau lebih tinggi. 0,8 L (0,85 L bila kasa dibersihkan). Jangan campur oli beda merek atau kelas. Ada indikator OIL CHANGE di meter (hal. 27-28)"},
+ {id:"gardan",name:"Oli final drive",km:12000,mo:0,note:"Ganti. Kapasitas 0,12 L, penggantian perlu keterampilan mekanik"},
+ {id:"busi",name:"Busi",km:12000,mo:0,note:"Ganti NGK LMAR8L-9, celah 0,8 - 0,9 mm. Periksa tiap 6.000 km"},
+ {id:"filter",name:"Saringan udara",km:18000,mo:0,note:"Ganti. Lebih sering bila sering di area basah atau berdebu"},
+ {id:"kasa",name:"Saringan kasa oli mesin",km:12000,mo:0,act:"dibersihkan",note:"Bersihkan"},
+ {id:"vbelt",name:"Drive belt",km:24000,mo:0,note:"Ganti. Periksa di 12.000 km, reset indikator V-BELT setelah servis"},
+ {id:"kampas",name:"Kampas rem",km:6000,mo:12,act:"diperiksa",note:"Periksa keausan. Ganti kampas kiri dan kanan bersamaan bila sudah mencapai tanda indikator keausan"},
+ {id:"minyakrem",name:"Minyak rem",km:24000,mo:24,note:"Ganti DOT 3 atau DOT 4, penggantian perlu keterampilan mekanik"},
+ {id:"coolant",name:"Cairan pendingin radiator",km:36000,mo:36,note:"Ganti dengan HONDA PRE-MIX COOLANT, 0,50 L. Periksa tiap 12.000 km"},
+ {id:"bbm",name:"Saluran bahan bakar",km:6000,mo:12,act:"diperiksa",note:"Periksa"},
+ {id:"gas",name:"Cara kerja gas tangan",km:6000,mo:12,act:"diperiksa",note:"Periksa. Jarak main bebas gas tangan 2 sampai 6 mm. Lihat hal. 103"},
+ {id:"napas",name:"Pernapasan bak mesin",km:6000,mo:0,act:"dibersihkan",note:"Bersihkan. Lebih sering bila sering berkendara saat hujan atau kecepatan tinggi, atau setelah motor dicuci atau jatuh. Servis bila ada endapan di selang pembuangan"},
+ {id:"klep",name:"Jarak renggang klep",km:6000,mo:0,act:"diperiksa",note:"Periksa. Disarankan di bengkel AHASS"},
+ {id:"stasioner",name:"Putaran stasioner mesin",km:6000,mo:12,act:"diperiksa",note:"Periksa. Spesifikasi 1.700 ± 100 rpm"},
+ {id:"aki",name:"Baterai",km:6000,mo:12,act:"diperiksa",note:"Periksa. Tipe maintenance-free: tidak perlu cek air aki, bersihkan terminal bila kotor atau berkarat. Lihat hal. 92 dan 83"},
+ {id:"sisrem",name:"Sistem rem",km:6000,mo:12,act:"diperiksa",note:"Periksa. Lihat hal. 82"},
+ {id:"lampu",name:"Arah sinar lampu depan",km:6000,mo:12,act:"diperiksa",note:"Periksa"},
+ {id:"standar",name:"Standar samping",km:6000,mo:12,act:"diperiksa",note:"Periksa. Mesin harus mati saat standar samping diturunkan. Lihat hal. 102"},
+ {id:"suspensi",name:"Suspensi",km:6000,mo:12,act:"diperiksa",note:"Periksa. Disarankan di bengkel AHASS"},
+ {id:"ban",name:"Roda dan ban",km:6000,mo:12,act:"diperiksa",note:"Periksa. Ukur tekanan minimal sebulan sekali saat ban dingin: depan 200 kPa, belakang 225 kPa (250 kPa bila berboncengan). Tapak minimum 1,5 mm depan, 2,0 mm belakang. Ganti ban bila indikator TWI sudah terlihat. Hanya ban tubeless. Lihat hal. 88"},
+ {id:"pendingin",name:"Sistem pendingin",km:12000,mo:12,act:"diperiksa",note:"Periksa"},
+ {id:"baut",name:"Mur, baut, pengencang",km:12000,mo:12,act:"diperiksa",note:"Periksa. Pertama kali di 1.000 km, lalu tiap 12.000 km"},
+ {id:"kopling",name:"Keausan kampas kopling",km:12000,mo:0,act:"diperiksa",note:"Periksa. Teknikal, servis di bengkel AHASS"},
+ {id:"kemudi",name:"Bantalan kepala kemudi",km:12000,mo:12,act:"diperiksa",note:"Periksa. Teknikal, servis di bengkel AHASS"}
+];
+const ACC=[["Giallo","#ffd400","#0a0a0b"],["Rosso","#e30613","#ffffff"],["Biru","#2d6bff","#ffffff"]];
+const KEY="pcx160-servis-v1";
+let S={odo:0,rec:{},log:[],acc:0,buy:"",hist:[],bk:"",docs:{stnk:"",sim:""},stamp:{},pre:{date:"",done:[]}},flt="all",boot=true,shown=0,tT,undoFn=null,ht;
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const fmt=n=>Number(n).toLocaleString("id-ID");
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const tgl=d=>new Date(d).toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
+const addMonths=(d,m)=>{const x=new Date(d);x.setMonth(x.getMonth()+m);return x};
+
+function calc(it){
+  const r=S.rec[it.id];
+  if(!r)return{unknown:true,pct:0,left:null,dueTxt:"",last:0,date:null,eta:null};
+  let pct=0,left=null,dueTxt="";
+  if(it.km){const used=S.odo-r.km;pct=used/it.km;left=it.km-used;dueTxt=fmt(r.km+it.km)+" km"+(rate()?" (perkiraan "+tgl(new Date(Date.now()+Math.max(0,left)/rate()*864e5))+")":"")}
+  if(it.mo){
+    const due=addMonths(r.date,it.mo),p=(Date.now()-new Date(r.date))/(due-new Date(r.date));
+    if(p>pct)pct=p;
+    dueTxt+=(dueTxt?" atau ":"")+tgl(due);
+  }
+  let eta=null;
+  if(it.km&&rate())eta=new Date(Date.now()+Math.max(0,left)/rate()*864e5);
+  if(it.mo){const due=addMonths(r.date,it.mo);if(!eta||due<eta)eta=due}
+  return{unknown:false,pct,left,dueTxt,last:r.km,date:r.date,eta};
+}
+function status(p){return p>=1?["due","Segera servis"]:p>=.75?["soon","Mendekati"]:["ok","Aman"]}
+function health(){
+  const t=ITEMS.filter(i=>S.rec[i.id]);
+  if(!t.length)return null;
+  return 1-t.reduce((a,i)=>a+Math.min(1,Math.max(0,calc(i).pct)),0)/t.length;
+}
+function setG(h){
+  const p=h==null?0:h;
+  $("gArc").style.strokeDasharray=(377*p)+" 503";
+  $("needle").style.transform="rotate("+(-135+270*p)+"deg)";
+}
+function paint(n){
+  $("odoShow").innerHTML=[...fmt(n)].map(c=>/\d/.test(c)?"<i>"+c+"</i>":"<u>"+c+"</u>").join("")+"<small>km</small>";
+}
+function countTo(v){
+  const f=shown,t0=performance.now();
+  (function step(t){
+    const k=Math.min(1,(t-t0)/900),e=1-Math.pow(1-k,3);
+    shown=Math.round(f+(v-f)*e);paint(shown);
+    if(k<1)requestAnimationFrame(step);
+  })(t0);
+}
+function toast(msg,undo){
+  $("tMsg").textContent=msg;undoFn=undo||null;$("tUndo").hidden=!undo;
+  $("toast").classList.add("show");clearTimeout(tT);
+  tT=setTimeout(()=>$("toast").classList.remove("show"),6000);
+}
+
+function addHist(km,date){
+  S.hist=(S.hist||[]).filter(x=>x.date!==date);
+  S.hist.push({km,date});
+  S.hist.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.km-b.km);
+}
+function rate(){
+  const h=S.hist||[];
+  if(h.length<2)return null;
+  const l=h[h.length-1],cut=new Date(l.date)-180*864e5,f=h.find(x=>new Date(x.date)>=cut)||h[0];
+  const days=(new Date(l.date)-new Date(f.date))/864e5;
+  if(days<14)return null;
+  const r=(l.km-f.km)/days;
+  return r>0?r:null;
+}
+const H=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const PRE=["Bahan bakar cukup","Gas tangan membuka dan menutup penuh dengan lancar","Tinggi oli mesin di antara tanda batas atas dan bawah, tidak ada kebocoran","Tinggi cairan pendingin di antara UPPER dan LOWER saat mesin dingin, tidak ada kebocoran","Rem depan dan belakang berfungsi, minyak rem di atas tanda batas bawah, kampas masih tebal","Lampu, indikator, dan klakson berfungsi","Cut-off pengapian di standar samping berfungsi","Roda dan ban: kondisi baik, tekanan udara sesuai"];
+const MSL=[1,6,12,18,24,30,36,42,48,54];
+const MS={
+ oli:m=>m%6===0?"G":0,gardan:m=>m%12===0?"G":0,busi:m=>m%12===0?"G":m%6===0?"P":0,filter:m=>m%18===0?"G":0,kasa:m=>m%12===0?"B":0,
+ vbelt:m=>m%24===0?"G":m%12===0?"P":0,minyakrem:m=>m%24===0?"G":m%6===0?"P":0,coolant:m=>m%36===0?"G":m%12===0?"P":0,napas:m=>m%6===0?"B":0
+};
+["kampas","bbm","gas","klep","stasioner","aki","sisrem","lampu","standar","suspensi","ban"].forEach(id=>{MS[id]=m=>m%6===0?"P":0});
+["pendingin","baut","kopling","kemudi"].forEach(id=>{MS[id]=m=>m%12===0?"P":0});
+let msSel=null;
+function act(id,m){
+  if(m===1)return id==="oli"?"G":(id==="sisrem"||id==="baut")?"P":0;
+  const f=MS[id];return f?f(m):0;
+}
+function kmAt(t){
+  const h=S.hist||[];
+  if(h.length<2)return null;
+  const T=h.map(x=>new Date(x.date).getTime());
+  if(t<T[0])return null;
+  if(t>=T[T.length-1])return h[h.length-1].km;
+  const i=T.findIndex(x=>x>t)-1;
+  return h[i].km+(h[i+1].km-h[i].km)*(t-T[i])/(T[i+1]-T[i]);
+}
+function renderBars(){
+  const now=new Date(),bs=[];
+  for(let k=5;k>=0;k--){
+    const a=new Date(now.getFullYear(),now.getMonth()-k,1),b=new Date(now.getFullYear(),now.getMonth()-k+1,1);
+    const x=kmAt(a.getTime()),y=kmAt(Math.min(b.getTime(),now.getTime()));
+    bs.push({l:a.toLocaleDateString("id-ID",{month:"short"}),v:x==null||y==null?null:Math.max(0,Math.round(y-x))});
+  }
+  const mx=Math.max(1,...bs.map(x=>x.v||0));
+  $("bars").innerHTML=bs.some(x=>x.v!=null)?bs.map(x=>`<div><b>${x.v==null?"-":fmt(x.v)}</b><i style="height:${x.v==null?0:Math.max(2,x.v/mx*90)}px"></i><span>${x.l}</span></div>`).join(""):`<p class="hint">Catat odometer di dua tanggal berbeda atau lebih untuk melihat grafik.</p>`;
+}
+function preMsg(){
+  const n=S.pre.done.length,ok=n===PRE.length;
+  $("preMsg").textContent=ok?"Siap jalan.":"Sisa "+(PRE.length-n)+" pemeriksaan.";
+  $("cek").classList.toggle("ready",ok);
+}
+function renderPre(){
+  if(!S.pre||S.pre.date!==today())S.pre={date:today(),done:[]};
+  $("preList").innerHTML=PRE.map((t,i)=>`<label><input type="checkbox" data-p="${i}"${S.pre.done.includes(i)?" checked":""}>${t}</label>`).join("");
+  preMsg();
+}
+function renderMs(){
+  const m=msSel||MSL.find(x=>x*1000>=S.odo)||54,n=MSL.indexOf(m)+1;
+  $("msChips").innerHTML=MSL.map((x,i)=>`<button class="chip${x===m?" on":""}" type="button" data-m="${x}">${i+1}. ${fmt(x*1000)} km</button>`).join("");
+  const g={G:[],P:[],B:[]};
+  ITEMS.forEach(it=>{const a=act(it.id,m);if(a)g[a].push(it.name)});
+  const fee=n===1?"Gratis jasa servis dan oli mesin":n<=3?"Gratis jasa servis":"Biaya ditanggung konsumen";
+  const grp=(t,l)=>l.length?`<div class="mg"><h4>${t}<b>${l.length}</b></h4><p>${l.join(", ")}</p></div>`:"";
+  $("msBox").innerHTML=`<div class="mh"><div><b>Servis ke-${n}</b><span> · ${fee}</span></div><button class="btn" type="button" id="msGo" data-m="${m}">Catat kunjungan ini</button></div>`+grp("Ganti",g.G)+grp("Periksa",g.P)+grp("Bersihkan",g.B)+`<p class="hint">Tonggak setelah 36.000 km mengikuti pola berulang sesuai catatan di buku (hal. 81).</p>`;
+}
+const WAR=[["Mesin","3 tahun atau 36.000 km, mana yang lebih dulu",36,36000],["Umum (rangka dan kelistrikan)","1 tahun atau 12.000 km, mana yang lebih dulu",12,12000],["Sistem PGM-FI","5 tahun atau 60.000 km, mana yang lebih dulu",60,60000],["Rangka bodi","5 tahun",60,0]];
+function renderWar(){
+  $("warBox").innerHTML=WAR.map(([n,d,mo,km])=>{
+    let pct=km?S.odo/km:0;const t=[];
+    if(km)t.push("sisa "+fmt(Math.max(0,km-S.odo))+" km");
+    if(S.buy){const due=addMonths(S.buy,mo),p=(Date.now()-new Date(S.buy))/(due-new Date(S.buy));if(p>pct)pct=p;t.push("sampai "+tgl(due))}
+    else t.push("isi tanggal beli untuk batas waktu");
+    const st=pct>=1?["due","Berakhir"]:pct>=.75?["soon","Mendekati akhir"]:["ok","Berlaku"];
+    return `<div class="nx ${st[0]}"><div><b>${n}</b><br><span>${d}</span></div><div class="when">${st[1]}<br><span>${t.join(", ")}</span></div></div>`;
+  }).join("");
+}
+function renderExtra(){
+  const sum=S.log.reduce((a,x)=>a+(x.cost||0),0);
+  $("costSum").textContent=sum?"Total biaya tercatat: Rp "+fmt(sum):"";
+  const dd=S.bk?Math.floor((Date.now()-new Date(S.bk+"T00:00:00"))/864e5):null;
+  $("bk").textContent=S.bk?"Cadangan terakhir: "+tgl(S.bk)+(dd>30?". Sudah lebih dari 30 hari, sebaiknya cadangkan lagi.":""):(S.log.length?"Belum pernah mencadangkan data. Ekspor cadangan supaya data tidak hilang.":"");
+  $("bk").className="hint"+((!S.bk&&S.log.length)||dd>30?" due":"");
+  $("dStnk").value=S.docs.stnk||"";$("dSim").value=S.docs.sim||"";
+  $("dInfo").textContent=[["stnk","Pajak STNK"],["sim","SIM"]].filter(([k])=>S.docs[k]).map(([k,t])=>{
+    const n=Math.ceil((new Date(S.docs[k]+"T00:00:00")-new Date())/864e5);
+    return t+": "+tgl(S.docs[k])+(n>=0?", "+n+" hari lagi":", sudah lewat "+(-n)+" hari");
+  }).join(" · ");
+  renderPre();renderMs();renderBars();renderWar();
+}
+const ALL=()=>ITEMS.concat(KPB);
+const ISO=/^\d{4}-\d{2}-\d{2}$/;
+const nameOf=id=>(ALL().find(i=>i.id===id)||{name:"Item"}).name;
+function kcalc(k){
+  let pct=S.odo/k.km,txt="Sisa <b>"+fmt(Math.max(0,k.km-S.odo))+" km</b>";
+  if(S.buy){
+    const due=addMonths(S.buy,k.mo),p=(Date.now()-new Date(S.buy))/(due-new Date(S.buy));
+    if(p>pct)pct=p;
+    txt+=" atau sampai <b>"+tgl(due)+"</b>";
+  }else txt+=". Isi tanggal beli untuk batas bulan";
+  return{pct,txt};
+}
+function latest(id){
+  return S.log.filter(x=>x.id===id).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:b.km-a.km)[0];
+}
+function syncRec(id){const l=latest(id);if(l)S.rec[id]={km:l.km,date:l.date};else delete S.rec[id]}
+function clean(d){
+  const ok=(k,dt)=>Number.isFinite(k)&&k>=0&&ISO.test(dt);
+  const o={odo:Math.max(0,parseInt(d.odo,10)||0),buy:ISO.test(d.buy)?d.buy:"",acc:Math.min(ACC.length-1,Math.max(0,parseInt(d.acc,10)||0)),rec:{},log:[],hist:[],bk:"",docs:{stnk:ISO.test((d.docs||{}).stnk)?d.docs.stnk:"",sim:ISO.test((d.docs||{}).sim)?d.docs.sim:""},stamp:{},pre:{date:"",done:[]}};
+  (Array.isArray(d.log)?d.log:[]).forEach(x=>{
+    if(x&&ALL().some(i=>i.id===x.id)&&ok(x.km,x.date))o.log.push({id:x.id,name:nameOf(x.id),km:Math.round(x.km),date:x.date,...(Number.isFinite(x.cost)&&x.cost>0?{cost:Math.round(x.cost)}:{}),...(typeof x.shop==="string"&&x.shop?{shop:x.shop.slice(0,60)}:{}),...(typeof x.note==="string"&&x.note?{note:x.note.slice(0,160)}:{}),...(typeof x.v==="string"?{v:x.v.slice(0,20)}:{})});
+  });
+  (Array.isArray(d.hist)?d.hist:[]).forEach(x=>{if(x&&ok(x.km,x.date))o.hist.push({km:Math.round(x.km),date:x.date})});
+  o.hist.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.km-b.km);
+  KPB.forEach(k=>{if(d.stamp&&d.stamp[k.id]===true)o.stamp[k.id]=true});
+  const r=d.rec&&typeof d.rec==="object"?d.rec:{};
+  Object.keys(r).forEach(id=>{if(ALL().some(i=>i.id===id)&&r[id]&&ok(r[id].km,r[id].date))o.rec[id]={km:Math.round(r[id].km),date:r[id].date}});
+  return o;
+}
+function render(anim){
+  const en=anim?" enter":"";
+  $("kpbList").innerHTML=KPB.map((k,i)=>{
+    const r=S.rec[k.id],c=kcalc(k),p=c.pct;
+    const cls=r?"ok":p>=1?"due":p>=.75?"soon":"mute";
+    const lbl=r?"Sudah dipakai":p>=1?"Lewat batas":p>=.75?"Segera pakai":"Masih berlaku";
+    return `<article class="card kpb ${cls}${en}" style="--i:${i}"><span class="num" aria-hidden="true">${i+1}</span><div class="top"><h3>${k.name}</h3><span class="pill">${lbl}</span></div><p class="sub">${k.when}</p><p class="free">${k.free}</p><div class="meta"><span>${r?"Dipakai di <b>"+fmt(r.km)+" km</b>, "+tgl(r.date):c.txt}</span></div>${r?`<button class="ghost stamp" type="button" data-id="${k.id}">${S.stamp&&S.stamp[k.id]?"Buku sudah distempel AHASS":"Tandai buku sudah distempel"}</button>`:`<button class="hold" type="button" data-id="${k.id}"><span>Tahan untuk pakai KPB</span></button>`}</article>`;
+  }).join("");
+
+  const rows=ITEMS.map(it=>{const d=calc(it);return{it,d,s:d.unknown?["mute","Belum dicatat"]:status(d.pct)}});
+  const c={ok:0,soon:0,due:0,mute:0};
+  rows.forEach(x=>c[x.s[0]]++);
+  rows.sort((a,b)=>(b.d.unknown?-1:b.d.pct)-(a.d.unknown?-1:a.d.pct));
+  const nx=rows.filter(x=>!x.d.unknown).slice(0,4);
+  $("nextBox").innerHTML=nx.length?nx.map(x=>{
+    const {it,d,s}=x;
+    const when=d.pct>=1?"Sekarang":d.eta?tgl(d.eta):"Di "+fmt(d.last+it.km)+" km";
+    const sisa=d.left===null?"":d.left>=0?"Sisa "+fmt(d.left)+" km":"Lewat "+fmt(-d.left)+" km";
+    return `<div class="nx ${s[0]}"><div><b>${it.name}</b><br><span>${sisa} · ${s[1]}</span></div><div class="when">${when}</div></div>`;
+  }).join("")+(rate()?"":`<p class="hint">Catat odometer di beberapa tanggal berbeda, minimal selang dua minggu, supaya perkiraan tanggal muncul.</p>`):`<p class="hint">Catat servis pertama di bagian Riwayat untuk melihat jadwal berikutnya.</p>`;
+  const list=rows.filter(x=>flt==="all"||x.s[0]===flt);
+  $("chips").innerHTML=[["all","Semua"],["due","Perlu servis"],["soon","Mendekati"],["ok","Aman"],["mute","Belum dicatat"]].map(([k,t])=>`<button class="chip${flt===k?" on":""}" type="button" data-f="${k}">${t}<b>${k==="all"?rows.length:c[k]}</b></button>`).join("");
+  $("grid").innerHTML=list.length?list.map((x,i)=>{
+    const {it,d,s}=x;
+    const lastTxt=d.unknown?"Belum dicatat":fmt(d.last)+" km, "+tgl(d.date);
+    const leftTxt=d.left===null?"":(d.left>=0?"Sisa <b>"+fmt(d.left)+" km</b>":"Lewat <b>"+fmt(-d.left)+" km</b>");
+    const iv=(it.km?"Tiap "+fmt(it.km)+" km":"")+(it.km&&it.mo?" atau ":"")+(it.mo?"tiap "+it.mo+" bulan":"");
+    return `<article class="card comp ${s[0]}${en}" style="--i:${i}" tabindex="0"><div class="top"><h3>${it.name}</h3><span class="pill">${s[1]}</span></div><div class="bar"><i style="width:${Math.min(100,Math.max(3,d.pct*100))}%"></i></div><div class="meta"><span>Terakhir: <b>${lastTxt}</b></span><span>${leftTxt}</span></div><div class="more"><div><p class="sub">${iv}. ${it.note}</p><div class="meta"><span>Jadwal berikut: <b>${d.dueTxt||"-"}</b></span></div></div></div><button class="hold" type="button" data-id="${it.id}"><span>Tahan untuk ${it.act||"diganti"}</span></button></article>`;
+  }).join(""):`<p class="empty">Tidak ada komponen di kategori ini.</p>`;
+
+  const ls=S.log.map((x,i)=>({...x,i})).sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:y.km-x.km);
+  $("log").innerHTML=ls.length?ls.map(x=>{
+    const sub=[x.shop,x.note].filter(Boolean).join(" · ");
+    return `<li><div>${nameOf(x.id)}<span> · ${fmt(x.km)} km${x.cost?" · Rp "+fmt(x.cost):""}</span>${sub?`<br><span class="sm">${H(sub)}</span>`:""}</div><span>${tgl(x.date)}<button class="del" type="button" data-i="${x.i}">Hapus</button></span></li>`;
+  }).join(""):`<li class="empty">Belum ada catatan. Tahan tombol di kartu komponen setelah servis, atau pakai Catat kunjungan bengkel di atas.</li>`;
+
+  const h=health(),n=ITEMS.filter(i=>S.rec[i.id]).length;
+  $("gVal").textContent=h==null?"--":Math.round(h*100)+"%";
+  $("gSub").textContent=n+" dari "+ITEMS.length+" komponen tercatat";
+  renderExtra();
+  if(!boot)setG(h);
+}
+
+function record(ids,km,date,x){
+  const v=Date.now().toString(36),n0=S.log.length;
+  ids.forEach((id,i)=>{
+    const e={id,name:nameOf(id),km,date,v};
+    if(i===0&&x.cost>0)e.cost=x.cost;
+    if(x.shop)e.shop=x.shop;
+    if(x.note)e.note=x.note;
+    S.log.push(e);syncRec(id);
+  });
+  return()=>{S.log.splice(n0);ids.forEach(id=>syncRec(id))};
+}
+function complete(id){
+  const ids=id==="kpb1"?["kpb1","oli"]:[id];
+  const undo=record(ids,S.odo,today(),{});
+  save();render();
+  toast(nameOf(id)+" tercatat di "+fmt(S.odo)+" km"+(ids.length>1?". Oli mesin ikut tercatat.":""),()=>{undo();save();render()});
+}
+function hStart(e){
+  const b=e.target.closest&&e.target.closest(".hold");
+  if(!b||b.classList.contains("holding"))return;
+  if(!S.odo){toast("Isi odometer dulu, lalu tahan tombolnya");$("odoIn").focus();return}
+  b.classList.add("holding");clearTimeout(ht);
+  ht=setTimeout(()=>{b.classList.remove("holding");complete(b.dataset.id)},800);
+}
+function hEnd(){clearTimeout(ht);document.querySelectorAll(".holding").forEach(b=>b.classList.remove("holding"))}
+document.addEventListener("pointerdown",hStart);
+["pointerup","pointercancel"].forEach(t=>document.addEventListener(t,hEnd));
+document.addEventListener("keydown",e=>{
+  const t=e.target,k=e.key==="Enter"||e.key===" ";
+  if(!k||!t.closest)return;
+  if(t.closest(".hold")){e.preventDefault();if(!e.repeat)hStart(e)}
+  else if(t.classList.contains("comp")){e.preventDefault();t.classList.toggle("open")}
+});
+document.addEventListener("keyup",e=>{if(e.key==="Enter"||e.key===" ")hEnd()});
+document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".hold"))e.preventDefault()});
+document.addEventListener("pointerdown",e=>{
+  const b=e.target.closest&&e.target.closest(".btn,.chip,.ghost");
+  if(!b)return;
+  const r=b.getBoundingClientRect();
+  b.style.setProperty("--cx",(e.clientX-r.left)+"px");b.style.setProperty("--cy",(e.clientY-r.top)+"px");
+  b.classList.remove("pop");void b.offsetWidth;b.classList.add("pop");
+});
+
+function glow(e){
+  const c=e.target.closest(".card");
+  if(!c||e.pointerType!=="mouse")return;
+  const b=c.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top;
+  c.style.setProperty("--mx",x+"px");c.style.setProperty("--my",y+"px");
+  c.style.setProperty("--rx",((y/b.height-.5)*-6)+"deg");c.style.setProperty("--ry",((x/b.width-.5)*8)+"deg");
+}
+function unglow(e){
+  const c=e.target.closest(".card");
+  if(c&&!c.contains(e.relatedTarget)){c.style.setProperty("--rx","0deg");c.style.setProperty("--ry","0deg")}
+}
+["grid","kpbList"].forEach(id=>{$(id).addEventListener("pointermove",glow);$(id).addEventListener("mouseout",unglow)});
+$("grid").addEventListener("click",e=>{
+  const c=e.target.closest(".comp");
+  if(c&&!e.target.closest(".hold"))c.classList.toggle("open");
+});
+$("chips").addEventListener("click",e=>{
+  const b=e.target.closest(".chip");
+  if(b){flt=b.dataset.f;render(true)}
+});
+
+$("saveOdo").onclick=()=>{
+  const inp=$("odoIn"),v=parseInt(inp.value,10);
+  if(isNaN(v)||v<0){inp.focus();toast("Masukkan angka odometer yang valid");return}
+  const warn=v<S.odo;
+  if(warn){if(!confirm("Angka ini lebih kecil dari odometer sebelumnya ("+fmt(S.odo)+" km). Lanjutkan?"))return;S.hist=(S.hist||[]).filter(x=>x.km<=v)}
+  S.odo=v;addHist(v,today());save();countTo(v);render();inp.value="";
+  toast(warn?"Angka ini lebih kecil dari odometer sebelumnya. Pastikan sudah benar.":"Odometer tersimpan: "+fmt(v)+" km");
+};
+$("odoIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("saveOdo").click()});
+$("tUndo").onclick=()=>{if(undoFn)undoFn();undoFn=null;$("toast").classList.remove("show")};
+
+function applyAcc(){
+  const a=ACC[S.acc||0],r=document.documentElement.style;
+  r.setProperty("--acc",a[1]);r.setProperty("--on",a[2]);
+  $("acc").textContent="Warna: "+a[0];
+}
+$("acc").onclick=()=>{
+  const w=$("wipe");w.classList.remove("go");void w.offsetWidth;w.classList.add("go");
+  setTimeout(()=>{S.acc=((S.acc||0)+1)%ACC.length;save();applyAcc()},380);
+};
+
+const links=[...document.querySelectorAll(".links a")];
+const io=new IntersectionObserver(es=>es.forEach(en=>{
+  if(en.isIntersecting)links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+en.target.id));
+}),{rootMargin:"-45% 0px -50% 0px"});
+document.querySelectorAll("main section").forEach(s=>io.observe(s));
+
+let tk="";
+for(let i=0;i<28;i++)tk+=`<line class="tick" x1="100" y1="5" x2="100" y2="${i%3===0?14:10}" transform="rotate(${-135+i*10} 100 100)"/>`;
+$("ticks").innerHTML=tk;
+
+$("hChecks").innerHTML=ITEMS.map(i=>`<label><input type="checkbox" value="${i.id}">${i.name}</label>`).join("");
+$("hDate").value=today();$("hDate").max=today();$("buyIn").max=today();$("buyIn").value=S.buy||"";
+$("buyIn").onchange=()=>{
+  const v=$("buyIn").value;
+  S.buy=ISO.test(v)&&v<=today()?v:"";
+  if(!S.buy)$("buyIn").value="";
+  save();render();toast(S.buy?"Tanggal beli tersimpan":"Tanggal beli dikosongkan");
+};
+$("hAdd").onclick=()=>{
+  const km=parseInt($("hKm").value,10),dt=$("hDate").value,kp=$("hKpb").value;
+  const ids=[...document.querySelectorAll("#hChecks input:checked")].map(i=>i.value);
+  if(kp)ids.unshift(kp);
+  if(isNaN(km)||km<0||!ISO.test(dt)||dt>today()){toast("Isi km dan tanggal servis yang valid");return}
+  if(!ids.length){toast("Pilih minimal satu komponen atau KPB");return}
+  const cost=parseInt($("hCost").value,10)||0,po=S.odo,ph=(S.hist||[]).slice();
+  const undo=record(ids,km,dt,{cost,shop:$("hShop").value.trim().slice(0,60),note:$("hNote").value.trim().slice(0,160)});
+  addHist(km,dt);
+  let msg=ids.length+" item dicatat di "+fmt(km)+" km";
+  if(km>S.odo){S.odo=km;countTo(km);msg+=". Odometer disesuaikan."}
+  save();render();
+  ["hKm","hCost","hShop","hNote"].forEach(i=>$(i).value="");$("hKpb").value="";
+  document.querySelectorAll("#hChecks input").forEach(i=>i.checked=false);
+  toast(msg,()=>{undo();S.odo=po;S.hist=ph;countTo(po);save();render()});
+};
+$("log").addEventListener("click",e=>{
+  const b=e.target.closest(".del");if(!b)return;
+  const i=+b.dataset.i,x=S.log[i];if(!x)return;
+  S.log.splice(i,1);syncRec(x.id);save();render();
+  toast(nameOf(x.id)+" dihapus dari riwayat",()=>{S.log.splice(i,0,x);syncRec(x.id);save();render()});
+});
+$("exp").onclick=()=>{
+  const b=new Blob([JSON.stringify({app:"pcx160-servis",v:2,odo:S.odo,buy:S.buy,acc:S.acc,rec:S.rec,log:S.log,hist:S.hist,docs:S.docs,stamp:S.stamp},null,1)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="pcx160-servis-"+today()+".json";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  S.bk=today();save();render();toast("Cadangan diunduh");
+};
+$("imp").onclick=()=>$("impFile").click();
+$("impFile").onchange=e=>{
+  const f=e.target.files[0];e.target.value="";
+  if(!f)return;
+  if(f.size>1000000){toast("File cadangan terlalu besar");return}
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const d=JSON.parse(fr.result);
+      if(!d||typeof d!=="object")throw new Error("format");
+      const prev=S,load=()=>{save();countTo(S.odo);$("buyIn").value=S.buy;applyAcc();render(true)};
+      S=clean(d);load();
+      toast("Cadangan dimuat",()=>{S=prev;load()});
+    }catch(err){toast("File cadangan tidak valid")}
+  };
+  fr.readAsText(f);
+};
+$("preList").addEventListener("change",e=>{
+  const i=+e.target.dataset.p,d=S.pre.done;
+  if(e.target.checked){if(!d.includes(i))d.push(i)}else S.pre.done=d.filter(x=>x!==i);
+  save();preMsg();
+});
+$("msChips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(b){msSel=+b.dataset.m;renderMs()}});
+$("msBox").addEventListener("click",e=>{
+  if(!e.target.closest("#msGo"))return;
+  const m=+$("msGo").dataset.m,d=$("visit");d.open=true;
+  document.querySelectorAll("#hChecks input").forEach(i=>{i.checked=!!act(i.value,m)});
+  $("hKpb").value=m===1?"kpb1":m===6?"kpb2":m===12?"kpb3":"";
+  $("hKm").value=S.odo||"";$("hDate").value=today();
+  d.scrollIntoView({behavior:"smooth",block:"center"});
+});
+$("hKpb").onchange=()=>{if($("hKpb").value==="kpb1")document.querySelector('#hChecks input[value="oli"]').checked=true};
+$("kpbList").addEventListener("click",e=>{
+  const b=e.target.closest(".stamp");if(!b)return;
+  S.stamp=S.stamp||{};S.stamp[b.dataset.id]=!S.stamp[b.dataset.id];save();render();
+});
+["dStnk","dSim"].forEach(id=>{$(id).onchange=()=>{
+  const v=$(id).value;S.docs[id==="dStnk"?"stnk":"sim"]=ISO.test(v)?v:"";save();render();toast("Tanggal dokumen tersimpan");
+}});
+$("prt").onclick=()=>{
+  $("pInfo").textContent="Odometer "+fmt(S.odo)+" km"+(S.buy?" · Dibeli "+tgl(S.buy):"")+" · Dicetak "+tgl(today());
+  window.print();
+};
+$("ics").onclick=()=>{
+  const ev=ITEMS.map(it=>({it,d:calc(it)})).filter(x=>!x.d.unknown&&x.d.eta);
+  if(!ev.length&&!S.docs.stnk&&!S.docs.sim){toast("Belum ada perkiraan tanggal. Catat servis dan odometer di beberapa tanggal berbeda.");return}
+  const pad=n=>String(n).padStart(2,"0"),ymd=d=>d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+  const esc=t=>t.replace(/,/g,"\\,").replace(/;/g,"\\;");
+  const stamp=new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z";
+  const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//PCX160 Servis//ID","CALSCALE:GREGORIAN"];
+  ev.forEach(({it,d})=>{
+    const at=d.eta<new Date()?new Date():d.eta,end=new Date(at);end.setDate(end.getDate()+1);
+    L.push("BEGIN:VEVENT","UID:"+it.id+"-"+ymd(at)+"@pcx160","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+ymd(at),"DTEND;VALUE=DATE:"+ymd(end),
+      "SUMMARY:"+esc("Servis PCX 160: "+it.name),"DESCRIPTION:"+esc("Jatuh tempo di "+fmt(d.last+it.km)+" km. Tanggal ini perkiraan dari kebiasaan berkendara Anda."),
+      "BEGIN:VALARM","TRIGGER:-P3D","ACTION:DISPLAY","DESCRIPTION:Servis PCX 160","END:VALARM","END:VEVENT");
+  });
+  [["stnk","Perpanjang pajak STNK"],["sim","Perpanjang SIM"]].forEach(([k,t])=>{
+    const v=S.docs[k];if(!v)return;
+    const at=new Date(v+"T00:00:00"),end=new Date(at);end.setDate(end.getDate()+1);
+    L.push("BEGIN:VEVENT","UID:"+k+"-"+ymd(at)+"@pcx160","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+ymd(at),"DTEND;VALUE=DATE:"+ymd(end),"SUMMARY:"+t,"BEGIN:VALARM","TRIGGER:-P30D","ACTION:DISPLAY","DESCRIPTION:"+t,"END:VALARM","END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  const b=new Blob([L.join("\r\n")],{type:"text/calendar"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download="pcx160-pengingat.ics";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast(L.filter(x=>x==="BEGIN:VEVENT").length+" pengingat disimpan. Buka file untuk menambahkannya ke kalender.");
+};
+let dip=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;$("inst").hidden=false});
+window.addEventListener("appinstalled",()=>{$("inst").hidden=true});
+$("inst").onclick=async()=>{if(!dip)return;dip.prompt();await dip.userChoice;dip=null;$("inst").hidden=true};
+if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register("sw.js").catch(()=>{});
+applyAcc();paint(0);render(true);setG(1);countTo(S.odo);
+setTimeout(()=>{boot=false;setG(health())},1200);
+</script>
+</body>
+</html>
